@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <title>Title</title>
+</head>
+
+<body>
+  <div id="banner-message">
+    <p id="result"></p>
+  </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+  function minWalk(gridList, startX, startY, endX, endY) {
+
+    const state = {
+      startPos: [startX, startY],
+      endPos: [endX, endY],
+      step: [],
+      route: []
+    };
+
+    const matrixArr = defaultArr => {
+      // create matrix   
+      let newMatrix = defaultArr.map(item => {
+        return item.split('').map(el => {
+          return (el === '.' ? 0 : 1);
+        })
+      });
+
+      return newMatrix;
+    };
+
+    const matrix = matrixArr(gridList);
+
+    if (matrix) {
+      if (gridList.length > 100 || gridList[0].length < 100) {
+        matrix[state.startPos[0]][state.startPos[1]] = 1;
+        state.step.push([state.startPos]);
+
+        while (state.step.length > 0) {
+          let way = state.step.shift();
+          let disp = way[way.length - 1];
+
+          for (let i = -1; i < 2; i++) {
+            for (let j = -1; j < 2; j++) {
+              if (i != 0 || j != 0) {
+                state.route.push([disp[0] + i, disp[0] + j]);
+              }
+            }
+          }
+
+          for (let i = 0; i < state.route.length; i++) {
+            if (state.route[i][0] == state.endPos[0] && state.route[i][1] == state.endPos[1]) {
+              return way.length;
+            }
+
+            if (state.route[i][0] < 0 || state.route[i][0] >= matrix[0].length
+              || state.route[i][1] < 0 || state.route[i][1] >= matrix[0].length
+              || matrix[state.route[i][0]][state.route[i][1]] != 0) continue;
+
+            matrix[state.route[i][0]][state.route[i][1]] = 1;
+            state.step.push(way.concat([state.route[i]]));
+          }
+        }
+      } else {
+        console.error('Something went wrong! Check the data and try again!');
+        return false;
+      }
+    } else {
+      console.error('Something went wrong! Check the data and try again!');
+      return false;
+    }
+  }
+
+  const result = minWalk(
+    [
+      '.X.',
+      '.X.',
+      '...',
+    ],
+    2, 1,
+    0, 2
+  );
+
+  console.log(result);
+  $('#result').text('Необходимое количество ходов: ' + result);
+</script>
+
+</html>
